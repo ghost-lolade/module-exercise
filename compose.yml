@@ -22,6 +22,7 @@ services:
       
     volumes:
       - ./src:/var/www/html:delegated
+      - /var/www/html/vendor
       - ./src/modules/User:/var/www/html/modules/User:ro
     depends_on:
       - mysql
