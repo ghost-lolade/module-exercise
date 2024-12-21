@@ -1,6 +1,20 @@
-# ./src/Dockerfile
 #############################
-# Stage 1 - Build
+# Stage 1 - Node.js for Frontend Build
+#############################
+FROM node:18-slim AS frontend-builder
+
+WORKDIR /app
+
+# Copy frontend package files and install dependencies
+COPY package.json package-lock.json /app/
+RUN npm install
+
+# Copy the Vue.js application files and build assets
+COPY . /app/
+RUN npm run build
+
+#############################
+# Stage 2 - PHP for Backend Build
 #############################
 FROM php:8.2-fpm-bullseye AS builder
 
@@ -32,7 +46,7 @@ COPY . .
 RUN composer dump-autoload --optimize
 
 #############################
-# Stage 2 - Production
+# Stage 3 - Production
 #############################
 FROM php:8.2-fpm-bullseye
 
@@ -54,7 +68,8 @@ COPY --from=builder /var/www/html ./
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage
 
-RUN php artisan config:clear
+RUN php artisan config:cache
+RUN php artisan route:cache
 
 EXPOSE 9000
 CMD ["php-fpm"]
