@@ -14,11 +14,11 @@ services:
       
       # Database environment
       DB_CONNECTION: mysql
-      DB_HOST: localhost
+      DB_HOST: mysql
       DB_PORT: 3306
-      DB_DATABASE: app
+      DB_DATABASE: mode
       DB_USERNAME: appuser
-      DB_PASSWORD: apppass
+      DB_PASSWORD: password
       
     volumes:
       - ./src:/var/www/html:delegated
@@ -26,29 +26,35 @@ services:
       - ./src/modules/User:/var/www/html/modules/User:ro
     depends_on:
       - mysql
-    
+    ports:
+      - "9000:9000" # PHP-FPM listens on this port
+
+  web:
+    image: nginx:alpine
+    container_name: nginx_server
+    restart: unless-stopped
+    depends_on:
+      - app
+    volumes:
+      - ./src:/var/www/html
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
       - "59000:80"
-    command: >
-      sh -c "
-      until php -r 'try { new PDO(\"mysql:host=mysql;dbname=app\", \"appuser\", \"apppass\"); } catch (Exception $e) { exit(1); }'; do
-        echo 'Waiting for database connection...'; sleep 2;
-      done;
-      php artisan migrate --force &&
-      php artisan serve --host=0.0.0.0 --port=80
-      "
+    command:
 
   mysql:
     image: mysql:8.0
-    container_name: laravel_db
+    container_name: mode_db
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: app
+      MYSQL_DATABASE: mode
       MYSQL_USER: appuser
-      MYSQL_PASSWORD: apppass
+      MYSQL_PASSWORD: password
       MYSQL_ROOT_PASSWORD: rootpass
     volumes:
       - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
     healthcheck:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
       retries: 5
