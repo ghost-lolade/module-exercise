@@ -63,6 +63,8 @@ RUN apt-get update && apt-get install -y \
 # Copy application from builder stage
 WORKDIR /var/www/html
 COPY --from=builder /var/www/html ./
+# Copy Vue.js built assets from frontend-builder stage
+COPY --from=frontend-builder /app/public/build /var/www/html/public/build
 
 # Set correct permissions
 RUN chown -R www-data:www-data /var/www/html \
