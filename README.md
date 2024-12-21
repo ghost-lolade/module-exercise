@@ -1,4 +1,3 @@
-
 # Laravel User Management Application
 
 This is a Laravel-based application with a simple UI for managing users. The app integrates backend APIs to list users, enable/disable user accounts, and maintain persistent data. The frontend uses Bootstrap and Axios for an appealing and functional interface.
@@ -237,13 +236,22 @@ DB_PASSWORD=apppass
 
 ### 3. Build and Start the Application
 
+
+Build the frontend:
+
+```bash
+npm run build
+```
+
+
 Use Docker Compose to build and run the containers:
 
 ```bash
 docker-compose up --build
 ```
 
-### 4. Run Database Migrations and Seeders
+### 
+4. Run Database Migrations and Seeders
 
 After the containers are running, execute the following commands to set up the database:
 
